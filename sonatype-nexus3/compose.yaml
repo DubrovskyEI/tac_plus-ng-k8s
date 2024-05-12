@@ -1,0 +1,12 @@
+services:
+  nexus3:
+    restart: unless-stopped
+    image: sonatype/nexus3:latest
+    container_name: nexus3
+    ports:
+      # Web-UI
+      - "8081:8081"
+      # Docker registry
+      - "8123:8123"
+    volumes:
+      - "./nexus-data:/nexus-data"

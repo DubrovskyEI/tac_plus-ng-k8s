@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tac-plus-ng-with-local-pvc
+  labels:
+    app: tac-plus-ng
+
+spec:
+  selector:
+    matchLabels:
+      app: tac-plus-ng
+  replicas: 2
+  minReadySeconds: 15
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: tac-plus-ng
+    spec:
+      containers:
+        - name: tac-plus-ng-app
+          image: dev-nexus.lan:8123/tac-plus-ng-k8s:latest
+          command: ["/usr/local/sbin/tac_plus-ng", "-f", "/usr/local/etc/tac_plus-ng.cfg"]
+          ports:
+            - name: tacacs-port
+              containerPort: 49
+          volumeMounts:
+            - name: tac-plus-ng-config-volume
+              mountPath: /usr/local/etc/tac_plus-ng.cfg
+              subPath: tac_plus-ng.cfg
+            - name: tac-plus-ng-logs-volume
+              mountPath: /var/log/tac_plus-ng
+          envFrom:
+            - secretRef:
+                name: tac-plus-ng-secret-env
+
+      volumes:
+        - name: tac-plus-ng-config-volume
+          configMap:
+            name: tac-plus-ng-config
+        - name: tac-plus-ng-logs-volume
+          persistentVolumeClaim:
+            claimName: tac-plus-ng-logs-pvc
+
+      imagePullSecrets:
+        - name: nexus-pull-secret

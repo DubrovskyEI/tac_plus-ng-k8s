@@ -1,0 +1,17 @@
+# https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#create-a-persistentvolumeclaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tac-plus-ng-logs-pvc
+  labels:
+    app: tac-plus-ng
+
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # Request 300Mi out of 500Mi defined in PersistentVolume
+      storage: 300Mi
+

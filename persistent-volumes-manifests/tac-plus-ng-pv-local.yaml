@@ -1,0 +1,34 @@
+# https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#create-a-persistentvolume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: tac-plus-ng-logs-pv
+  labels:
+    app: tac-plus-ng
+
+spec:
+  capacity:
+    # The maximum size could be requested by PersistentVolumeClaim
+    storage: 500Mi
+  volumeMode: Filesystem
+  # The volume can be mounted as read-write by a single node
+  # ReadWriteOnce access mode still can allow multiple pods to access
+  # the volume when the pods are running on the same node
+  accessModes:
+    - ReadWriteOnce
+  # Manual reclamation (the PV will not be deleted)
+  persistentVolumeReclaimPolicy: Retain
+  # Use StorageClass defined in manifest sc-local.yaml
+  storageClassName: local-storage
+  # The volume is at /var/log/tac_plus-ng on the cluster's Node
+  local:
+    path: /var/log/tac_plus-ng
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            # Cluster's Node name
+            values:
+              - minikube
