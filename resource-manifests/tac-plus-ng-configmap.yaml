@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tac-plus-ng-config
+  labels:
+    app: tac-plus-ng
+
+data:
+  tac_plus-ng.cfg: |
+    id = spawnd {
+      listen = { port = 49 }
+      spawn = {
+        instances min = 1
+        instances max = 10
+      }
+      background = yes
+    }
+
+    id = tac_plus-ng {
+
+      log authclog { destination = /var/log/tac_plus-ng/authentication/%d-%m-%Y.log }
+      log authzlog { destination = /var/log/tac_plus-ng/authorization/%d-%m-%Y.log }
+      log acctlog  { destination = /var/log/tac_plus-ng/accounting/%d-%m-%Y.log }
+
+      authentication log = authclog
+      authorization log = authzlog
+      accounting log = acctlog
+
+      login backend = mavis
+      user backend = mavis
+      pap backend = mavis
+
+      host world {
+        address = ::/0
+        welcome banner = "Welcome\n"
+        enable 15 = clear secret
+        # key = demo
+        # Use SECRET_KEY from environment variable loaded from secret tac-plus-ng-secret
+        key = "${SECRET_KEY}"
+      }
+
+      profile admins {
+        script {
+          if (service == shell) {
+            if (cmd == "")
+              set priv-lvl = 15
+            permit
+          }
+        }
+      }
+
+      profile readonly {
+        enable = deny
+        script {
+          if (service == shell) {
+            if (cmd == "")
+              set priv-lvl = 1
+            permit
+          }
+        }
+      }
+
+      group admins
+      group guest
+
+      user demo {
+        password login = clear demo
+        member = admins
+      }
+
+      user = readonly {
+        password login = clear readonly
+        member = guest
+      }
+
+      ruleset {
+        rule {
+          script {
+            if (member == admins) { profile = admins permit }
+            if (member == guest) { profile = readonly permit }
+          }
+        }
+      }
+    }
+

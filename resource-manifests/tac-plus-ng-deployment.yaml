@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tac-plus-ng
+  labels:
+    app: tac-plus-ng
+
+spec:
+  selector:
+    matchLabels:
+      app: tac-plus-ng
+  # The number of desired Pods
+  replicas: 2
+  # Minimum seconds for which a newly created Pod should be ready without
+  # any of its containers crashing, for it to be considered available
+  minReadySeconds: 15
+  # The strategy used to replace old Pods by new ones
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # The maximum number of Pods that can be unavailable during the update process
+      maxUnavailable: 1
+      # The maximum number of Pods that can be created over the desired number of Pods
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: tac-plus-ng
+    spec:
+      containers:
+        - name: tac-plus-ng-app
+          image: dev-nexus.lan:8123/tac-plus-ng-k8s:latest
+          command: ["/usr/local/sbin/tac_plus-ng", "-f", "/usr/local/etc/tac_plus-ng.cfg"]
+          ports:
+            - name: tacacs-port
+              containerPort: 49
+          volumeMounts:
+            - name: tac-plus-ng-config-volume
+              mountPath: /usr/local/etc/tac_plus-ng.cfg
+              subPath: tac_plus-ng.cfg
+          envFrom:
+            - secretRef:
+                name: tac-plus-ng-secret-env
+
+      volumes:
+        - name: tac-plus-ng-config-volume
+          configMap:
+            name: tac-plus-ng-config
+
+      imagePullSecrets:
+        - name: nexus-pull-secret

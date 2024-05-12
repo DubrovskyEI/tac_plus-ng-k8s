@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tac-plus-ng-service
+spec:
+  # External load balancer between the pods
+  type: LoadBalancer
+  ports:
+    # The port in which the service gets requests
+    - port: 49
+      protocol: TCP
+      # The port at which incomming requests are forwarded
+      targetPort: 49
+  # Object that contains properties for selecting pods
+  selector:
+    # Defines which pods to target, only pods
+    # that are labeled with “app: tac-plus-ng”
+    app: tac-plus-ng

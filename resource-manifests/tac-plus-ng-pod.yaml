@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: tac-plus-ng
+  labels:
+    app: tac-plus-ng
+
+# Spec defines the desired state for the resource
+spec:
+  # Array of containers running in pod
+  containers:
+    - name: tac-plus-ng-app
+      # The container image to start in this pod
+      image: dev-nexus.lan:8123/tac-plus-ng-k8s:latest
+      # Command to run on container startup
+      command: ["/usr/local/sbin/tac_plus-ng", "-f", "/usr/local/etc/tac_plus-ng.cfg"]
+      ports:
+        # The port at which the container is listening for documentation purposes
+        # (dropping the port doesn’t restrict access)
+        - name: tacacs-port
+          containerPort: 49
+      # List of mounted volumes defined below
+      volumeMounts:
+        - name: tac-plus-ng-config-volume
+          # The destination inside the container a volume gets mounted to
+          mountPath: /usr/local/etc/tac_plus-ng.cfg
+          # Using certain part from mounted volume (file tac_plus-ng.cfg)
+          subPath: tac_plus-ng.cfg
+      # Using envFrom to load Secrets into environment variables
+      envFrom:
+        - secretRef:
+            name: tac-plus-ng-secret-env
+
+  # List of volumes for this pod
+  volumes:
+    # Volume created from configMap resource
+    - name: tac-plus-ng-config-volume
+      configMap:
+        name: tac-plus-ng-config
+
+  # K8s get the docker registry credentials from secret
+  imagePullSecrets:
+    - name: nexus-pull-secret
