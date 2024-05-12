@@ -16,6 +16,7 @@ export DOCKER_REGISTRY="dev-nexus.lan:8123"
 
 > [!Tip]
 > In test purpose can be used Sonatype Nexus Repository Manager in Docker running locally
+> [Example of local deployment](sonatype-nexus3/README.md)
 
 Build Docker image from the Dockerfile
 
