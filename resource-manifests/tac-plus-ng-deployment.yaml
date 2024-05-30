@@ -23,6 +23,8 @@ spec:
       maxUnavailable: 1
       # The maximum number of Pods that can be created over the desired number of Pods
       maxSurge: 1
+
+  # Specifies the pod template that the Deployment will use to create new pods    
   template:
     metadata:
       labels:
