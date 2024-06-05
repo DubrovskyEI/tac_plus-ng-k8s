@@ -62,7 +62,8 @@ kubectl create -f persistent-volumes-manifests/tac-plus-ng-pod-local-pvc.yaml
 ```
 
 > [!NOTE]
-> If run on a minicube, persistent volume stores on Cluster's Node `minikube`
+> If run on a minikube, persistent volume stores on Cluster's Node `minikube`.
+> 
 > To check manually you need to connect to Node via ssh by execute:
 > `minikube ssh`
 
