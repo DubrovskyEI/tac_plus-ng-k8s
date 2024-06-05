@@ -42,7 +42,7 @@ kubectl create -f persistent-volumes-manifests/tac-plus-ng-pvc-local.yaml
 ##### Check out the state of created resources
 
 ```Bash
- kubectl get sc
+kubectl get sc
 ```
 
 ```Bash
