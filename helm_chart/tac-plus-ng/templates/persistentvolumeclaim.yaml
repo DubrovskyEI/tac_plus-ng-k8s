@@ -1,0 +1,18 @@
+{{ if .Values.persistentVolumeLocal.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.name }}-logs-pvc
+  labels:
+    app: {{ .Values.name }}
+    chart_name: {{ .Values.name }}
+    chart_version: {{ .Values.image.tag }}
+
+spec:
+  storageClassName: {{ .Values.persistentVolumeLocal.storageClassName }}
+  accessModes:
+    - {{ .Values.persistentVolumeLocal.accessModes }}
+  resources:
+    requests:
+      storage: {{ .Values.persistentVolumeLocal.requestsStorage }}
+{{- end }}

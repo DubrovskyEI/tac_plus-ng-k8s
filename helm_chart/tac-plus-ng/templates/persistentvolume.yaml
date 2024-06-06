@@ -1,0 +1,29 @@
+{{ if .Values.persistentVolumeLocal.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.name }}-logs-pv
+  labels:
+    app: {{ .Values.name }}
+    chart_name: {{ .Values.name }}
+    chart_version: {{ .Values.image.tag }}
+
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolumeLocal.capacityStorage }} 
+  volumeMode: Filesystem
+  accessModes:
+    - {{ .Values.persistentVolumeLocal.accessModes }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolumeLocal.persistentVolumeReclaimPolicy }}
+  storageClassName: {{ .Values.persistentVolumeLocal.storageClassName }}
+  local:
+    path: /var/log/tac_plus-ng
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - minikube
+{{- end }}

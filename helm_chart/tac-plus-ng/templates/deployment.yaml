@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.name }}
+    chart_name: {{ .Values.name }}
+    chart_version: {{ .Values.image.tag }}
+
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  replicas: {{ .Values.replicaCount }}
+  minReadySeconds: {{ .Values.minReadySeconds }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.rollingUpdate.maxSurge }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+        - name: {{ .Values.name }}-app
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/sbin/tac_plus-ng", "-f", "/usr/local/etc/tac_plus-ng.cfg"]
+          ports:
+            {{- range .Values.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: {{ .protocol }}
+            {{- end }}
+          volumeMounts:
+            - name: {{ .Values.name }}-config-volume
+              mountPath: /usr/local/etc/tac_plus-ng.cfg
+              subPath: tac_plus-ng.cfg
+            {{- if .Values.persistentVolumeLocal.enabled }}
+            - name: {{ .Values.name }}-logs-volume
+              mountPath: /var/log/tac_plus-ng
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.name }}-secret-env
+    
+      volumes:
+        - name: {{ .Values.name }}-config-volume
+          configMap:
+            name: {{ .Values.name }}-config
+        {{- if .Values.persistentVolumeLocal.enabled }}
+        - name: {{ .Values.name }}-logs-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.name }}-logs-pvc
+        {{- end }}
+
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecretName }}      

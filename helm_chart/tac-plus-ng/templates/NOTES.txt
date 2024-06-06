@@ -1,0 +1,34 @@
+TACACS+ NG Helm Chart Deployment
+
+1. TACACS+ NG Deployment Information:
+   - Release Name: {{ .Release.Name }}
+   - Namespace: {{ .Release.Namespace }}
+   - Chart Name: {{ .Chart.Name }}
+   - Chart Version: {{ .Values.image.tag }}
+
+2. TACACS+ NG Service Information:
+   - Service Name: {{ .Values.name }}-service
+   - Service Type: {{ .Values.serviceType }}
+   - Service Port: 49
+
+3. Accessing TACACS+ NG:
+   - Once the service is ready, NAS can access TACACS+ daemon at 49/TCP port for default
+
+   Note: If run on minikube to connect to LoadBalancer services need execute:
+         minikube tunnel --bind-address='<IP-ADDR>'
+         
+         bind-address is the ip-address to bind tunnel
+
+4. To store logs in local storage, set the persistentVolumeLocal.enabled: true
+
+5. Useful Commands:
+   - Check the TACACS+ NG Deployment Status:
+     helm status {{ .Release.Name }}
+
+   - Get Detailed Information about the TACACS+ NG Deployment:
+     helm get all {{ .Release.Name }}
+
+6. Clean Up:
+   - To uninstall the TACACS+ NG Deployment, run:
+     helm uninstall {{ .Release.Name }}
+

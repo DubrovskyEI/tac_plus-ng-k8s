@@ -1,0 +1,33 @@
+# Declare variables to be passed into templates
+
+name: tac-plus-ng
+replicaCount: 2
+minReadySeconds: 15
+
+serviceType: LoadBalancer
+
+ports:
+  - name: tacacs-port
+    port: 49
+    protocol: TCP
+
+persistentVolumeLocal:
+  enabled: true 
+  storageClassName: local-storage
+  volumeBindingMode: WaitForFirstConsumer
+  accessModes: ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  capacityStorage: 500Mi
+  requestsStorage: 300Mi
+
+image:
+  repository: dev-nexus.lan:8123/tac-plus-ng-k8s 
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: 51a7dfa 
+
+rollingUpdate:
+  maxUnavailable: 1
+  maxSurge: 1
+
+imagePullSecretName: nexus-pull-secret 
